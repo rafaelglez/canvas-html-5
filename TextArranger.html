@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+	<head>
+		<title></title>
+		<script src="./js/modernizr.js"></script>
+		<script src="./js/debugger.js"></script>
+		<script src="./js/TextArranger.js"></script>
+		<script src="./js/jscolor/jscolor.js"></script>
+	</head>
+	<body>
+		<canvas id="canvas" width="500" height="300">
+		</canvas>
+		<form>
+		Texto <input id="textBox" placeholder="Tu texto"/>
+		<br>
+		Tipo <select id = "fillOrStroke">
+			<option value = "fill">Rellenar</option>
+			<option value = "stroke">Delinear</option>
+			<option value = "both">Ambos</option>
+		</select>
+		<br>
+		Tipo de fuente<select id="fontStyle">
+			<option value="normal">Normal</option>
+			<option value="italic">Italica</option>
+			<option value="oblique">Oblicuo</option>
+		</select>
+		<br>
+		Grosor de fuente
+		<select id="fontWeight">
+			<option value="normal">Normal</option>
+			<option value="bold">Bold</option>
+			<option value="bolder">Bolder</option>
+			<option value="lighter">Lighter</option>
+		</select>
+		<br>
+		Fuente
+		<select id="textFont">
+			<option value="serif">serif</option>
+			<option value="sans-serif">sans-serif</option>
+			<option value="cursive">cursive</option>
+			<option value="fantasy">fantasy</option>
+			<option value="monospace">monospace</option>
+		</select>
+		<br>
+		Tamaño <input type="range" id="textSize" min="0" max="200" step="1" value="50"/>
+		<br>
+		Color <input id="picker" class="color" value="CCCCCC">
+		<br>
+		Linea base<select id="textBaseline">
+		<option value="middle">En medio</option>
+		<option value="top">Arriba</option>
+		<option value="hanging">Colgado</option>
+		<option value="alphabetic">Alfabético</option>
+		<option value="ideographic">Ideográfico</option>
+		<option value="bottom">Abajo</option>
+		</select>
+		<br>
+		Alineación <select id="textAlign">
+		<option value="center">Centrado</option>
+		<option value="start">Inicio</option>
+		<option value="end">Final</option>
+		<option value="left">Izquierda</option>
+		<option value="right">Derecha</option>
+		</select>
+		<hr>
+		Canvas Style Width: <input type="range" id="canvasStyleWidth" min="0" max="1000" step="1" value="500"/>
+		<br>
+		Canvas Style Height: <input type="range" id="canvasStyleHeight" min="0" max="1000" step="1" value="300"/>
+		<br>
+		</form>
+	</body>
+</html>
