@@ -38,7 +38,7 @@ function canvasApp(){
 		mouseX = e.clientX - offsetLeft;
 		mouseY = e.clientY - offsetTop;
 		//Debugger.log("clientX: "+e.clientX+" clientY: "+e.clientY);
-		Debugger.log("mouseX: "+mouseX+" mouseY: "+mouseY);
+		//Debugger.log("mouseX: "+mouseX+" mouseY: "+mouseY);
 	}
 	
 	function onMouseClick(e) {
@@ -46,11 +46,15 @@ function canvasApp(){
 		//find tile to highlight
 		var col = Math.floor(mouseX / 32);
 		var row = Math.floor(mouseY / 32);
-		var tileId = (row*totalRows-1) + (col+row);
+		//Debugger.log("col " + col + "= " + Math.floor(mouseX / 32)+" mouseX="+mouseX);
+		//Debugger.log("row " + row + "= " + Math.floor(mouseY / 32)+" mouseY="+mouseY);
+		var tileId = (row*(totalRows-1)) + (col+row);
+		//Debugger.log("tileId =" + tileId);
 		highlightTile(tileId,col*32,row*32)
 		}else{
 		var col = Math.floor(mouseX / 32);
 		var row = Math.floor(mouseY / 32);
+		Debugger.log(imageData);
 		context.putImageData(imageData,col*32,row*32);
 		}
 	}
@@ -61,7 +65,7 @@ function canvasApp(){
 		context.fillStyle = "#aaa";
 		context.fillRect(0,0,256,128);
 		drawTileSheet();
-		ImageData = context.getImageData(x,y,32,32);
+		imageData = context.getImageData(startX,startY,32,32);
 		for (j=3; j< imageData.data.length; j+=4){
 			imageData.data[j]=128;
 		}
