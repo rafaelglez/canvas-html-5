@@ -15,8 +15,8 @@ function canvasApp(){
 	}
 	var canvas = document.getElementById("canvas");
 	var context = canvas.getContext("2d");
-	var y = 10;
-	var x = 250;
+	var y = canvas.height/2;
+	var x = canvas.width/2;
 	var speedCtrl = document.getElementById("speed");
 	var dxCtrl = document.getElementById("dx");
 	var dyCtrl = document.getElementById("dy");
@@ -29,7 +29,7 @@ function canvasApp(){
 
 	function drawScreen() {
 		Debugger.log("speed: " + speed + " dx: " + dx + " dy: " + dy);
-		context.fillStyle = '#EEEEEE';
+		context.fillStyle = '#000';
 		context.fillRect(0, 0, canvas.width, canvas.height);
 		//Box
 		context.strokeStyle = '#000000';
@@ -37,7 +37,7 @@ function canvasApp(){
 		// Create ball
 		y = y + (speed * dy);
 		x = x + (speed * dx);
-		context.fillStyle = "#000000";
+		context.fillStyle = getColor();
 		context.beginPath();
 		context.arc(x,y,15,0,Math.PI*2,true);
 		context.closePath();
@@ -56,27 +56,36 @@ function canvasApp(){
 		Debugger.log(e.keyCode);
 		if (key == 83){
 			dy = dyCtrl.value = 0;
-			dx = dxCtrl.value =0;
+			dx = dxCtrl.value = 0;
 			window.clearTimeout(loop);
 		}
 		if (key == 38){
+			if(dx == 0 && dy == 0){
+				gameLoop();
+			}
 			dy = dyCtrl.value = -1;
 			dx = 0; 
 		}
 		if (key == 40){
+			if(dx == 0 && dy == 0){
+				gameLoop();
+			}
 			dy = dyCtrl.value = 1;
 			dx = 0;
 		}
 		if (key == 37){
+			if(dx == 0 && dy == 0){
+				gameLoop();
+			}
 			dx = dxCtrl.value = -1;
 			dy = 0;
 		}
 		if (key == 39){
+			if(dx == 0 && dy == 0){
+				gameLoop();
+			}
 			dx = dxCtrl.value = 1;
 			dy = 0;
-		}
-		
+		}	
 	}
-
-
 }
