@@ -44,11 +44,15 @@ function canvasApp(){
 		context.fill();
 	}
 	
-	function gameLoop() {
-		loop = window.setTimeout(gameLoop,20);
-		drawScreen()
-	}
-	gameLoop();
+	drawScreen();
+	
+	/*function gameLoop() {
+		drawScreen();
+	}*/
+	
+	//gameLoop();
+	//loop = window.setTimeout(gameLoop,50);
+	//loop = setInterval(drawScreen,50);
 
 	//Event handler
 	function keyDownListener(e){
@@ -57,32 +61,33 @@ function canvasApp(){
 		if (key == 83){
 			dy = dyCtrl.value = 0;
 			dx = dxCtrl.value = 0;
-			window.clearTimeout(loop);
+			//window.clearTimeout(loop);
+			clearInterval(loop);
 		}
 		if (key == 38){
 			if(dx == 0 && dy == 0){
-				gameLoop();
+				loop = setInterval(drawScreen,50);
 			}
 			dy = dyCtrl.value = -1;
 			dx = 0; 
 		}
 		if (key == 40){
 			if(dx == 0 && dy == 0){
-				gameLoop();
+				loop = setInterval(drawScreen,50);
 			}
 			dy = dyCtrl.value = 1;
 			dx = 0;
 		}
 		if (key == 37){
 			if(dx == 0 && dy == 0){
-				gameLoop();
+				loop = setInterval(drawScreen,50);
 			}
 			dx = dxCtrl.value = -1;
 			dy = 0;
 		}
 		if (key == 39){
 			if(dx == 0 && dy == 0){
-				gameLoop();
+				loop = setInterval(drawScreen,50);
 			}
 			dx = dxCtrl.value = 1;
 			dy = 0;
