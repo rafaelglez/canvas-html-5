@@ -21,7 +21,8 @@ function canvasApp(){
 	var p3 = {x:350, y:350};
 	var ball = {x:0, y:0, speed:.01, t:0};
 	var tx, ty;
-
+	var bcPoints = Array();
+	bcPoints.push({x:60, y:10});
 	// Add event listener to keyword
 	document.addEventListener("keydown",keyDownListener,false);
 	
@@ -31,8 +32,10 @@ function canvasApp(){
 	}
 	gameLoop();
 
-	function drawScreen () {		
+	function drawScreen () {	
+		if (bcPoints.length <= 101){
 		update();
+		}
 		render();
 	}
 	
@@ -44,12 +47,15 @@ function canvasApp(){
 		var cy = 3 * (p1.y - p0.y);
 		var by = 3 * (p2.y - p1.y) - cy;
 		var ay = p3.y - p0.y - cy - by;
-		xt = ax*(t*t*t) + bx*(t*t) + cx*t + p0.x;
-		yt = ay*(t*t*t) + by*(t*t) + cy*t + p0.y;
+		xt = Math.floor(ax*(t*t*t) + bx*(t*t) + cx*t + p0.x);
+		yt = Math.floor(ay*(t*t*t) + by*(t*t) + cy*t + p0.y)
 			ball.t += ball.speed;
 		if (ball.t > 1) {
 			ball.t = 1;
 		}
+		if (bcPoints.length <= 101)
+			bcPoints.push({x:xt, y:yt});
+		Debugger.log("t: " + ball.t);
 	}
 	
 	function render() {
@@ -89,11 +95,20 @@ function canvasApp(){
 		context.fillStyle = "#FFFFFF";
 		context.fillText("3",p3.x-2, p3.y+2);
 		//Draw circle moving
-		context.fillStyle = "#000000";
-		context.beginPath();
-		context.arc(xt,yt,5,0,Math.PI*2,true);
-		context.closePath();
-		context.fill();
+		if(ball.t < 1){
+			context.fillStyle = "#000000";
+			context.beginPath();
+			context.arc(xt,yt,5,0,Math.PI*2,true);
+			context.closePath();
+			context.fill();
+		}
+		else{
+			context.fillStyle = "#000000";
+			context.beginPath();
+			context.arc(xt,yt,5,0,Math.PI*2,true);
+			context.closePath();
+			context.fill();
+		}
 	}
 		
 	
@@ -103,6 +118,7 @@ function canvasApp(){
 		Debugger.log(e.keyCode);
 		if (key == 83){
 		clearInterval(loop);
+		Debugger.log(bcPoints);
 		}
 	}
 }
