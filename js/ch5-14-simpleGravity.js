@@ -23,6 +23,8 @@ function canvasApp(){
 	var radians = angle * Math.PI/ 180;
 	var angleRev = 180 - angle;
 	var radiansRev = angleRev * Math.PI/ 180;
+	var angleBck = 360 - angle;
+	var radiansBck = angleBck * Math.PI/ 180;
 	var curRadians = radians;
 	var radius = 15;
 	var vx = Math.cos(curRadians) * speed;
@@ -53,8 +55,14 @@ function canvasApp(){
 			ball.velocityy += gravity;
 		}
 		if (ball.y > canvas.height - ball.radius) {
+			curRadians = radians;
 			ball.velocityy = Math.sin(curRadians) * speed;
 		}
+		if (ball.y < 0 + ball.radius) {
+			curRadians = radiansBck;
+			ball.velocityx = Math.cos(curRadians) * speed;
+			ball.velocityy = Math.sin(curRadians) * speed;
+		}		
 		if (ball.x > canvas.width - ball.radius) {
 			curRadians = radiansRev;
 			ball.velocityx = Math.cos(curRadians) * speed;
