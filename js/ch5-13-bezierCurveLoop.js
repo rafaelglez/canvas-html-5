@@ -2,6 +2,7 @@
 window.addEventListener('load', eventWindowLoaded, false);
 
 var bullseye = new Image();
+
 function eventWindowLoaded() {
 	bullseye.src = "./img/bullseye.png"
   	bullseye.addEventListener('load', eventAssetsLoaded, false);
