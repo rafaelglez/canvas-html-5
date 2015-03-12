@@ -71,9 +71,8 @@ function canvasApp(){
 		//draw the points
 		for (var i = 0; i< points.length; i++) {
 			context.beginPath();
-			  context.arc(points[i].x, points[i].y - shipOffsetY, Math.floor(easeValue*i), 0, -Math.PI, false);
+			  context.arc(points[i].x, points[i].y - shipOffsetY, 3, 0, -Math.PI, false);
 			  context.fillStyle = '#fff';
-			  context.fill();
 			  context.stroke();
 		}
 		context.drawImage(shipImage,ship.x - shipOffsetX, ship.y);

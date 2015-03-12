@@ -25,10 +25,14 @@ function canvasApp(){
 	var canvas = document.getElementById("canvas");
 	var context = canvas.getContext("2d");
 	var loop;
-	var p1 = {x:240,y:-20};
-	var p2 = {x:240,y:470};
+	var p1 = {x:240,y:470};
 	var easeValue = .03;
-	var ship = {x:p1.x, y:p1.y, endx: p2.x, endy:p2.y, velocityx:0, velocityy:0};
+	var tempSpeed = .5;
+	var tempAngle = 270 ;
+	var tempRadians = tempAngle * Math.PI/ 180;
+	var tempvelocityx = Math.cos(tempRadians) * tempSpeed;
+	var tempvelocityy = Math.sin(tempRadians) * tempSpeed;
+	var ship = {x:p1.x, y:p1.y, velocityx:tempvelocityx, velocityy:tempvelocityy};
 	var points = Array();
 	var shipOffsetX = shipImage.width/2;
 	var shipOffsetY = shipImage.height/2;
@@ -48,13 +52,11 @@ function canvasApp(){
 	}
 	
 	function update(){
-		var dx = ship.endx - ship.x;
-		var dy = ship.endy - ship.y;
-		ship.velocityx = dx * easeValue;
-		ship.velocityy = dy * easeValue;
+		ship.velocityx = ship.velocityx + (ship.velocityx * easeValue);
+		ship.velocityy = ship.velocityy + (ship.velocityy * easeValue)
 		ship.x += ship.velocityx;
 		ship.y += ship.velocityy;
-		if(ship.y+shipImage.height > canvas.height){
+		if(ship.y+shipImage.height < 0){
 			clearInterval(loop);
 			ship.velocityx = 0;
 			ship.velocityy = 0;
@@ -71,9 +73,8 @@ function canvasApp(){
 		//draw the points
 		for (var i = 0; i< points.length; i++) {
 			context.beginPath();
-			  context.arc(points[i].x, points[i].y - shipOffsetY, Math.floor(easeValue*i), 0, -Math.PI, false);
+			context.arc(points[i].x, (points[i].y + shipImage.height), 3, Math.PI, 0, false);
 			  context.fillStyle = '#fff';
-			  context.fill();
 			  context.stroke();
 		}
 		context.drawImage(shipImage,ship.x - shipOffsetX, ship.y);
