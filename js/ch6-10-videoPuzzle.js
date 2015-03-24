@@ -49,18 +49,23 @@ function canvasApp(){
 	var cols = 4;
 	var rows = 4;
 	var board = new Array();
+	var boardids = new Array();
+	var idgen = new IDGenerator();
 	var xPad = 10;
 	var yPad = 10;
 	var startXOffset = 10;
 	var startYOffset = 10;
 	var partWidth = videoElement.width / cols;
 	var partHeight = videoElement.height / rows;
+	var complete = false;
 	
 	
 	//Initialize Board
 	for (var i = 0; i < cols; i++) {
 		board[i] = new Array();
+		boardids[i] = new Array();
 		for (var j =0; j < rows; j++) {
+		boardids[i][j] = idgen.generate();
 		board[i][j] = {
 			finalCol:i,
 			finalRow:j,
@@ -68,13 +73,15 @@ function canvasApp(){
 			imageX:null, 
 			imageY:null, 
 			placeX:null, 
-			placeY:null, 
+			placeY:null,
+			id:boardids[i][j] 
 			};
 		}
 	}
+	//Debugger.log(board);
+	//Debugger.log(boardids);
+	//return false;
 	board = randomizeBoard(board);	
-	videoElement.play();
-	
 	
 	function randomizeBoard(board) {
 		var newBoard = new Array();
@@ -138,6 +145,7 @@ function canvasApp(){
 		//Box
 		context.strokeStyle = '#FFFFFF';
 		context.strokeRect(5, 5, canvas.width-10, canvas.height-10);
+		
 		for (var c = 0; c < cols; c++){
 			for (var r = 0; r < rows; r++) {
 				var tempPiece = board[c][r];
@@ -177,6 +185,12 @@ function eventMouseUp(event) {
 	
 	for (var c = 0; c < cols; c++) {
 		for (var r = 0; r < rows; r++) {
+			if(board[c][r] == boardids[c][r]){
+				complete = true;
+			}
+			else{
+				complete = false;	
+			}
 			pieceX = c*partWidth + c*xPad + startXOffset;
 			pieceY = r*partHeight + r*yPad + startYOffset;
 			if ((mouseY >= pieceY) && (mouseY <= pieceY+partHeight) && (mouseX >= pieceX) && (mouseX <= pieceX+partWidth)) {
@@ -200,6 +214,10 @@ function eventMouseUp(event) {
 		board[selected2.col][selected2.row] = tempPiece1;
 		board[selected1.col][selected1.row].selected = false;
 		board[selected2.col][selected2.row].selected = false;
+	}
+	
+	if (complete == true){
+		videoElement.play();
 	}
 }
 
