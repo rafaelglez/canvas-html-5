@@ -46,10 +46,11 @@ function canvasApp(){
 	var canvas = document.getElementById("canvas");
 	var context = canvas.getContext("2d");
 	var loop;
-	var cols = 4;
-	var rows = 4;
+	var cols = 3;
+	var rows = 3;
 	var board = new Array();
 	var boardids = new Array();
+	var completeAr = new Array();
 	var idgen = new IDGenerator();
 	var xPad = 10;
 	var yPad = 10;
@@ -57,8 +58,6 @@ function canvasApp(){
 	var startYOffset = 10;
 	var partWidth = videoElement.width / cols;
 	var partHeight = videoElement.height / rows;
-	var complete = false;
-	
 	
 	//Initialize Board
 	for (var i = 0; i < cols; i++) {
@@ -76,11 +75,9 @@ function canvasApp(){
 			placeY:null,
 			id:boardids[i][j] 
 			};
+		completeAr.push(false);
 		}
 	}
-	//Debugger.log(board);
-	//Debugger.log(boardids);
-	//return false;
 	board = randomizeBoard(board);	
 	
 	function randomizeBoard(board) {
@@ -125,6 +122,8 @@ function canvasApp(){
 	}
 	
 	function update(){
+		var complete = false;
+		var count = 0;
 		for (var c = 0; c < cols; c++) {
 			for (var r = 0; r < rows; r++) {
 				var tempPiece = board[c][r];
@@ -133,8 +132,24 @@ function canvasApp(){
 				tempPiece.placeX = c*partWidth + c*xPad + startXOffset;
 				tempPiece.placeY = r*partHeight + r*yPad + startYOffset;				
 				board[c][r] = tempPiece;
-				//Debugger.log(imageX+", "+imageY+", "+partWidth+", "+partHeight+", "+placeX+", "+placeY+", "+partWidth+", "+partHeight);
+				
+				if(tempPiece.id == boardids[c][r]){
+					completeAr[count++] = true;
+				}
+				else{
+					completeAr[count++] = false;	
+				}
 			}
+		}
+		complete = completeAr.reduce(function(previous, current) {
+			return previous && current;
+		});
+			
+		if (complete == false && !videoElement.paused){
+			videoElement.pause();
+		}
+		else if(complete == true && videoElement.paused){
+			videoElement.play();
 		}
 	}
 	
@@ -176,7 +191,7 @@ function eventMouseUp(event) {
 		x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
 		y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 	}
-	//Debugger.log("scroll Left :"+document.body.scrollLeft +" "+ document.documentElement.scrollLeft);
+	//Debugger.log("scroll Left :"+document.body	.scrollLeft +" "+ document.documentElement.scrollLeft);
 	//Debugger.log("scroll Top:"+document.body.scrollTop +" "+ document.documentElement.scrollTop);
 	x -= canvas.offsetLeft;
 	y -= canvas.offsetTop;
@@ -184,13 +199,7 @@ function eventMouseUp(event) {
 	mouseY=y;
 	
 	for (var c = 0; c < cols; c++) {
-		for (var r = 0; r < rows; r++) {
-			if(board[c][r] == boardids[c][r]){
-				complete = true;
-			}
-			else{
-				complete = false;	
-			}
+		for (var r = 0; r < rows; r++) {			
 			pieceX = c*partWidth + c*xPad + startXOffset;
 			pieceY = r*partHeight + r*yPad + startYOffset;
 			if ((mouseY >= pieceY) && (mouseY <= pieceY+partHeight) && (mouseX >= pieceX) && (mouseX <= pieceX+partWidth)) {
@@ -214,10 +223,6 @@ function eventMouseUp(event) {
 		board[selected2.col][selected2.row] = tempPiece1;
 		board[selected1.col][selected1.row].selected = false;
 		board[selected2.col][selected2.row].selected = false;
-	}
-	
-	if (complete == true){
-		videoElement.play();
 	}
 }
 
