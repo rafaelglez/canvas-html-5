@@ -46,18 +46,28 @@ function canvasApp(){
 	var canvas = document.getElementById("canvas");
 	var context = canvas.getContext("2d");
 	var loop;
-	var cols = 4;
-	var rows = 4;
+	var cols = 3;
+	var rows = 3;
 	var board = new Array();
 	var boardids = new Array();
 	var completeAr = new Array();
 	var idgen = new IDGenerator();
-	var xPad = 10;
-	var yPad = 10;
 	var startXOffset = 10;
 	var startYOffset = 10;
 	var partWidth = videoElement.width / cols;
 	var partHeight = videoElement.height / rows;
+	var xPad = (canvas.width - ((partWidth * cols)+(2*startXOffset))) / (cols - 1);
+	var yPad = (canvas.height - ((partHeight * cols)+(2*startYOffset))) / (rows - 1);
+	var animationFrame = new AnimationFrame();
+	
+	Debugger.log(canvas.width);
+	Debugger.log(videoElement.width);
+	Debugger.log(partWidth * cols);
+	Debugger.log(xPad);
+	
+	
+	//return false;
+	
 	
 	//Initialize Board
 	for (var i = 0; i < cols; i++) {
@@ -108,15 +118,13 @@ function canvasApp(){
 	document.addEventListener("mouseup",eventMouseUp, false);
 	// Add event listener to keyword
 	document.addEventListener("keydown",keyDownListener,false);
+	// Add event listener to video Element
+	videoElement.addEventListener("ended",videoEnded,false);
 	
-	gameLoop();
+	drawScreen();
 	
-	function gameLoop() {
-		loop = window.setTimeout(gameLoop, 20);
-		drawScreen();
-	}
-	
-	function drawScreen () {	
+	function drawScreen() {		
+		loop = animationFrame.request(drawScreen);
 		update();
 		render();
 	}
@@ -159,7 +167,7 @@ function canvasApp(){
 		context.fillRect(0, 0, canvas.width, canvas.height);
 		//Box
 		context.strokeStyle = '#FFFFFF';
-		context.strokeRect(5, 5, canvas.width-10, canvas.height-10);
+		context.strokeRect(startXOffset/2, startXOffset/2, canvas.width-startXOffset, canvas.height-startYOffset);
 		
 		for (var c = 0; c < cols; c++){
 			for (var r = 0; r < rows; r++) {
@@ -230,8 +238,15 @@ function eventMouseUp(event) {
 		var key = e.keyCode;
 		//Debugger.log(e.keyCode);
 		if (key == 83){
-		clearInterval(loop);
+		animationFrame.cancel(loop);
 		videoElement.pause();
 		}
 	}
+	
+	function videoEnded(e){
+		Debugger.log(e);
+		animationFrame.cancel(loop);
+		videoElement.pause();
+	}
+	
 }
