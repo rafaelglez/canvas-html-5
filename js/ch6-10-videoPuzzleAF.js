@@ -45,9 +45,9 @@ function canvasApp(){
 	}
 	var canvas = document.getElementById("canvas");
 	var context = canvas.getContext("2d");
+	var piecesCtrl = document.getElementById("pieces");
+	var cols = rows = piecesCtrl.value;
 	var loop;
-	var cols = 3;
-	var rows = 3;
 	var board = new Array();
 	var boardids = new Array();
 	var completeAr = new Array();
@@ -56,15 +56,16 @@ function canvasApp(){
 	var startYOffset = 10;
 	var partWidth = videoElement.width / cols;
 	var partHeight = videoElement.height / rows;
-	var xPad = (canvas.width - ((partWidth * cols)+(2*startXOffset))) / (cols - 1);
-	var yPad = (canvas.height - ((partHeight * cols)+(2*startYOffset))) / (rows - 1);
+	var divCols = cols - 1;
+	var divRows = rows - 1;
+	var xPad = (canvas.width - ((partWidth * cols) + (2*startXOffset))) / divCols;
+	var yPad = (canvas.height - ((partHeight * cols) + (2*startYOffset))) / divRows;
 	var animationFrame = new AnimationFrame();
-	
-	Debugger.log(canvas.width);
-	Debugger.log(videoElement.width);
-	Debugger.log(partWidth * cols);
-	Debugger.log(xPad);
-	
+	var complete = false;
+	var fPosXOffset = (divCols * xPad)/2;
+	var fPosYOffset = (divRows * yPad)/2;
+	var curPosXOffset = 0;
+	var curPosYOffset = 0;
 	
 	//return false;
 	
@@ -115,11 +116,13 @@ function canvasApp(){
 	}
 	
 	// Add event listener to mouse
-	document.addEventListener("mouseup",eventMouseUp, false);
+	canvas.addEventListener("mouseup",eventMouseUp, false);
 	// Add event listener to keyword
 	document.addEventListener("keydown",keyDownListener,false);
 	// Add event listener to video Element
 	videoElement.addEventListener("ended",videoEnded,false);
+	// Add event listener to slider Element
+	piecesCtrl.addEventListener("change",piecesCtrlSet,false);
 	
 	drawScreen();
 	
@@ -130,7 +133,8 @@ function canvasApp(){
 	}
 	
 	function update(){
-		var complete = false;
+		
+		if (complete == false){
 		var count = 0;
 		for (var c = 0; c < cols; c++) {
 			for (var r = 0; r < rows; r++) {
@@ -152,11 +156,34 @@ function canvasApp(){
 		complete = completeAr.reduce(function(previous, current) {
 			return previous && current;
 		});
-			
+		
+		}
+		
+		//Debugger.log(board);
 		if (complete == false && !videoElement.paused){
 			videoElement.pause();
 		}
-		else if(complete == true && videoElement.paused){
+		else if(complete == true){
+			document.removeEventListener("mouseup",eventMouseUp, false)
+			if(curPosXOffset < fPosXOffset){
+				curPosXOffset = curPosXOffset + 0.1;
+			}
+			if(curPosYOffset < fPosYOffset){
+				curPosYOffset = curPosYOffset + 0.1;
+			}
+			Debugger.log("fPosXOffset "+fPosXOffset);
+			Debugger.log("curPosXOffset "+curPosXOffset);
+				for (var c = 0; c < cols; c++) {
+					for (var r = 0; r < rows; r++) {
+						var tempPiece = board[c][r];
+						tempPiece.imageX = tempPiece.finalCol * partWidth;
+						tempPiece.imageY = tempPiece.finalRow * partHeight;
+						tempPiece.placeX = c*partWidth + startXOffset + curPosXOffset;
+						tempPiece.placeY = r*partHeight + startYOffset + curPosYOffset;
+						board[c][r] = tempPiece;
+					}
+				}			
+			// Add event listener to mouse
 			videoElement.play();
 		}
 	}
@@ -248,5 +275,12 @@ function eventMouseUp(event) {
 		animationFrame.cancel(loop);
 		videoElement.pause();
 	}
+	
+	function piecesCtrlSet(){
+		animationFrame.cancel(loop);
+		videoElement.pause();
+		canvasApp();
+	}
+
 	
 }
