@@ -43,6 +43,8 @@ function canvasApp(){
 	if (!canvasSupport()) {
 		return;
 	}
+	else{
+	
 	var canvas = document.getElementById("canvas");
 	var context = canvas.getContext("2d");
 	var piecesCtrl = document.getElementById("pieces");
@@ -67,29 +69,60 @@ function canvasApp(){
 	var curPosXOffset = 0;
 	var curPosYOffset = 0;
 	
+	init();
+	}
 	//return false;
 	
 	
 	//Initialize Board
-	for (var i = 0; i < cols; i++) {
-		board[i] = new Array();
-		boardids[i] = new Array();
-		for (var j =0; j < rows; j++) {
-		boardids[i][j] = idgen.generate();
-		board[i][j] = {
-			finalCol:i,
-			finalRow:j,
-			selected:false,
-			imageX:null, 
-			imageY:null, 
-			placeX:null, 
-			placeY:null,
-			id:boardids[i][j] 
-			};
-		completeAr.push(false);
+	function init(){
+		complete = false;
+		Debugger.log("cols: "+cols+" rows: "+rows);
+		board = new Array();
+		boardids = new Array();
+		completeAr = new Array();
+		partWidth = videoElement.width / cols;
+		partHeight = videoElement.height / rows;
+		divCols = cols - 1;
+		divRows = rows - 1;
+		xPad = (canvas.width - ((partWidth * cols) + (2*startXOffset))) / divCols;
+		yPad = (canvas.height - ((partHeight * cols) + (2*startYOffset))) / divRows;
+		fPosXOffset = (divCols * xPad)/2;
+		fPosYOffset = (divRows * yPad)/2;
+		curPosXOffset = 0;
+		curPosYOffset = 0;
+	
+		for (var i = 0; i < cols; i++) {
+			board[i] = new Array();
+			boardids[i] = new Array();
+			for (var j =0; j < rows; j++) {
+			boardids[i][j] = idgen.generate();
+			board[i][j] = {
+				finalCol:i,
+				finalRow:j,
+				selected:false,
+				imageX:null, 
+				imageY:null, 
+				placeX:null, 
+				placeY:null,
+				id:boardids[i][j] 
+				};
+			completeAr.push(false);
+			}
 		}
+		
+		board = randomizeBoard(board);	
+		// Add event listener to mouse
+		canvas.addEventListener("mouseup",eventMouseUp, false);
+		// Add event listener to keyword
+		document.addEventListener("keydown",keyDownListener,false);
+		// Add event listener to video Element
+		videoElement.addEventListener("ended",videoEnded,false);
+		// Add event listener to slider Element
+		piecesCtrl.addEventListener("change",piecesCtrlSet,false);
+		
+		drawScreen();
 	}
-	board = randomizeBoard(board);	
 	
 	function randomizeBoard(board) {
 		var newBoard = new Array();
@@ -115,17 +148,6 @@ function canvasApp(){
 		return newBoard;
 	}
 	
-	// Add event listener to mouse
-	canvas.addEventListener("mouseup",eventMouseUp, false);
-	// Add event listener to keyword
-	document.addEventListener("keydown",keyDownListener,false);
-	// Add event listener to video Element
-	videoElement.addEventListener("ended",videoEnded,false);
-	// Add event listener to slider Element
-	piecesCtrl.addEventListener("change",piecesCtrlSet,false);
-	
-	drawScreen();
-	
 	function drawScreen() {		
 		loop = animationFrame.request(drawScreen);
 		update();
@@ -133,7 +155,7 @@ function canvasApp(){
 	}
 	
 	function update(){
-		
+	Debugger.log("complete: "+complete);
 		if (complete == false){
 		var count = 0;
 		for (var c = 0; c < cols; c++) {
@@ -159,20 +181,23 @@ function canvasApp(){
 		
 		}
 		
-		//Debugger.log(board);
+		Debugger.log("complete reduce "+complete);
 		if (complete == false && !videoElement.paused){
 			videoElement.pause();
 		}
-		else if(complete == true){
-			document.removeEventListener("mouseup",eventMouseUp, false)
+		else if(complete == true && videoElement.paused){ //Just play and cancel event mouseUp lister
+			canvas.removeEventListener("mouseup",eventMouseUp, false);
+			videoElement.play();
+		}
+		else if(complete == true && !videoElement.paused){ //puzzle complete 
 			if(curPosXOffset < fPosXOffset){
 				curPosXOffset = curPosXOffset + 0.1;
 			}
 			if(curPosYOffset < fPosYOffset){
 				curPosYOffset = curPosYOffset + 0.1;
 			}
-			Debugger.log("fPosXOffset "+fPosXOffset);
-			Debugger.log("curPosXOffset "+curPosXOffset);
+			//Debugger.log("fPosXOffset "+fPosXOffset);
+			//Debugger.log("curPosXOffset "+curPosXOffset);
 				for (var c = 0; c < cols; c++) {
 					for (var r = 0; r < rows; r++) {
 						var tempPiece = board[c][r];
@@ -182,9 +207,7 @@ function canvasApp(){
 						tempPiece.placeY = r*partHeight + startYOffset + curPosYOffset;
 						board[c][r] = tempPiece;
 					}
-				}			
-			// Add event listener to mouse
-			videoElement.play();
+				}
 		}
 	}
 	
@@ -226,8 +249,6 @@ function eventMouseUp(event) {
 		x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
 		y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 	}
-	//Debugger.log("scroll Left :"+document.body	.scrollLeft +" "+ document.documentElement.scrollLeft);
-	//Debugger.log("scroll Top:"+document.body.scrollTop +" "+ document.documentElement.scrollTop);
 	x -= canvas.offsetLeft;
 	y -= canvas.offsetTop;
 	mouseX=x;
@@ -271,15 +292,20 @@ function eventMouseUp(event) {
 	}
 	
 	function videoEnded(e){
-		Debugger.log(e);
 		animationFrame.cancel(loop);
 		videoElement.pause();
 	}
 	
 	function piecesCtrlSet(){
+		// remove event listeners
+		canvas.removeEventListener("mouseup",eventMouseUp, false);
+		document.removeEventListener("keydown",keyDownListener,false);
+		videoElement.removeEventListener("ended",videoEnded,false);
 		animationFrame.cancel(loop);
 		videoElement.pause();
-		canvasApp();
+		complete = false;
+		cols = rows = piecesCtrl.value;
+		init();
 	}
 
 	
