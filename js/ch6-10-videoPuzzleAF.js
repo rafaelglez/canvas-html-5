@@ -14,16 +14,17 @@ function eventWindowLoaded() {
 	return;
 	}
 	videoElement.addEventListener("canplaythrough",videoLoaded,false);
-	videoElement.setAttribute("src", "./video/muirbeach." + videoType);
-	videoElement.setAttribute("width", 320);
-	videoElement.setAttribute("height", 240);
+	videoElement.setAttribute("src", "http://quiet.pcriot.com/video/blank." + videoType);
+	videoElement.setAttribute("width", 640);
+	videoElement.setAttribute("height", 360);
 }
 
 function supportedVideoFormat(video){
 	var returnExtension = "";
-	if (video.canPlayType("video/webm") == "probably" || video.canPlayType("video/webm") == "maybe") {
-		returnExtension = "webm";
-	} else if(video.canPlayType("video/mp4") == "probably" || video.canPlayType("video/mp4") == "maybe") {
+	//if (video.canPlayType("video/webm") == "probably" || video.canPlayType("video/webm") == "maybe") {
+//		returnExtension = "webm";
+//	} else 
+	if(video.canPlayType("video/mp4") == "probably" || video.canPlayType("video/mp4") == "maybe") {
 		returnExtension = "mp4";
 	} else if(video.canPlayType("video/ogg") =="probably" ||	video.canPlayType("video/ogg") == "maybe") {
 		returnExtension = "ogg";
