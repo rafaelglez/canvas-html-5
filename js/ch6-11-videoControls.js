@@ -19,7 +19,7 @@ function eventWindowLoaded() {
 		return;
 	}
 	videoElement.addEventListener("canplay",itemLoaded,false);
-	videoElement.setAttribute("src", "./video/muirbeach." + videoType);
+	videoElement.setAttribute("src", "http://quiet.pcriot.com/video/blank." + videoType);
 	buttonSheet = new Image();
 	buttonSheet.onload = itemLoaded;
 	buttonSheet.src = "./img/videobuttons.png";
