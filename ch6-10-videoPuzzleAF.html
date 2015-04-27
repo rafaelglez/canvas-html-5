@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title></title>
-        <link rel="stylesheet" href="./css/style.css" />
+        <link rel="stylesheet" href="./css/PuzzleStyle.css" />
 		<script src="./js/modernizr.js"></script>
 		<script src="./js/debugger.js"></script>
         <script src="./js/rainbowColor.js"></script>
@@ -14,18 +14,19 @@
 		<canvas id="canvas" width="690" height="410">
         </canvas>
   		<div id="container">      
-        Dificultad :<input type="range" id="pieces" min="2" max="5" step="1" value="3"/>
-        <div class="SmallPreviewImageContainer">
+        <div class="ImageContainer" id="imageontainer">
+		Escoge un video:
             <a class="SmallImage" rel="./img/thumb-blank.png" href="#">
-            <img class="thumb" src="./img/thumb-blank.png">
+				<img class="thumb" src="./img/thumb-blank.png" alt="blank" id="blank">
             </a>
             <a class="SmallImage" rel="./img/thumb-black.png" href="#">
-            <img class="thumb" src="./img/thumb-black.png">
+				<img class="thumb" src="./img/thumb-black.png" alt="black" id="black">
             </a>
             <a class="SmallImage" rel="./img/thumb-bailar.png" href="#">
-            <img class="thumb" src="./img/thumb-bailar.png">
+				<img class="thumb" src="./img/thumb-bailar.png" alt="bailar" id="bailar">
             </a>
         </div>
+		Selecciona la dificultad :<input type="range" id="difficulty" min="2" max="5" step="1" value="3"/>
  		</div>
 	</body>
 </html>	

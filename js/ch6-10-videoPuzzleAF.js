@@ -7,14 +7,14 @@ function eventWindowLoaded() {
 	videoDiv = document.createElement('div');
 	document.body.appendChild(videoDiv);
 	videoDiv.appendChild(videoElement);
-	videoDiv.setAttribute("style", "display:none;");
+	//videoDiv.setAttribute("style", "display:none;");
 	var videoType = supportedVideoFormat(videoElement);
 	if (videoType == "") {
 		alert("no video support");
 	return;
 	}
 	videoElement.addEventListener("canplaythrough",videoLoaded,false);
-	videoElement.setAttribute("src", "http://quiet.pcriot.com/video/blank." + videoType);
+videoElement.setAttribute("src", "http://quiet.pcriot.com/video/bailar" + "." + videoType);
 	videoElement.setAttribute("width", 640);
 	videoElement.setAttribute("height", 360);
 }
@@ -48,8 +48,9 @@ function canvasApp(){
 	
 	var canvas = document.getElementById("canvas");
 	var context = canvas.getContext("2d");
-	var piecesCtrl = document.getElementById("pieces");
-	var cols = rows = piecesCtrl.value;
+	var difficultyCtrl = document.getElementById("difficulty");
+	var cols = rows = difficultyCtrl.value;
+	var videoCtrl = document.getElementById("imageontainer");
 	var loop;
 	var board = new Array();
 	var boardids = new Array();
@@ -78,7 +79,7 @@ function canvasApp(){
 	//Initialize Board
 	function init(){
 		complete = false;
-		Debugger.log("cols: "+cols+" rows: "+rows);
+		//Debugger.log("cols: "+cols+" rows: "+rows);
 		board = new Array();
 		boardids = new Array();
 		completeAr = new Array();
@@ -120,7 +121,9 @@ function canvasApp(){
 		// Add event listener to video Element
 		videoElement.addEventListener("ended",videoEnded,false);
 		// Add event listener to slider Element
-		piecesCtrl.addEventListener("change",piecesCtrlSet,false);
+		difficultyCtrl.addEventListener("change",difficultyCtrlSet,false);
+		// Add event listener to check image video selected
+		videoCtrl.addEventListener("click",videoCtrlSet,false);
 		
 		drawScreen();
 	}
@@ -156,7 +159,7 @@ function canvasApp(){
 	}
 	
 	function update(){
-	Debugger.log("complete: "+complete);
+	//Debugger.log("complete: "+complete);
 		if (complete == false){
 		var count = 0;
 		for (var c = 0; c < cols; c++) {
@@ -182,7 +185,7 @@ function canvasApp(){
 		
 		}
 		
-		Debugger.log("complete reduce "+complete);
+		//Debugger.log("complete reduce "+complete);
 		if (complete == false && !videoElement.paused){
 			videoElement.pause();
 		}
@@ -231,6 +234,20 @@ function canvasApp(){
 			}
 		}		
 	}
+	
+	function getTarget(e) {
+        return e.srcElement || e.target;
+    }
+	
+	function preventDefault(e) {
+        e = e || window.event;
+        if (e.preventDefault) {
+            e.preventDefault();
+        } else {
+            e.returnValue = false;
+        }
+    }
+	
 	
 //Event handlers
 function eventMouseUp(event) {
@@ -297,7 +314,7 @@ function eventMouseUp(event) {
 		videoElement.pause();
 	}
 	
-	function piecesCtrlSet(){
+	function difficultyCtrlSet(){
 		// remove event listeners
 		canvas.removeEventListener("mouseup",eventMouseUp, false);
 		document.removeEventListener("keydown",keyDownListener,false);
@@ -305,9 +322,26 @@ function eventMouseUp(event) {
 		animationFrame.cancel(loop);
 		videoElement.pause();
 		complete = false;
-		cols = rows = piecesCtrl.value;
+		cols = rows = difficultyCtrl.value;
 		init();
 	}
-
 	
+	function videoCtrlSet(e){
+		var target;
+		//preventDefault(e);
+        target = getTarget(e);
+		Debugger.log(target.alt);
+		videoSel = target.alt;
+		canvas.removeEventListener("mouseup",eventMouseUp, false);
+		document.removeEventListener("keydown",keyDownListener,false);
+		videoElement.removeEventListener("ended",videoEnded,false);
+		videoElement.removeEventListener("canplaythrough",videoLoaded,false);
+		animationFrame.cancel(loop);
+		videoElement.pause();
+		complete = false;
+		var videoType = supportedVideoFormat(videoElement);
+		videoElement.setAttribute("src", "http://quiet.pcriot.com/video/" + videoSel + "." + videoType);
+		videoElement.removeEventListener("canplaythrough",videoLoaded,false);
+		init();
+	}
 }

@@ -1,3 +1,7 @@
+body{
+font-family:Verdana;
+font-size:12px;
+}
 input[type=range] {
     -webkit-appearance: none;
     background-color: silver;
@@ -20,6 +24,7 @@ left: 50px;
 }
 
 #container {
+width:200px;
 position: absolute; 
 top: 50px; 
 left: 750px;
