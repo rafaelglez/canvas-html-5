@@ -49,7 +49,7 @@ function canvasApp(){
 	var context = canvas.getContext("2d");
 	var difficultyCtrl = document.getElementById("difficulty");
 	var cols = rows = difficultyCtrl.value;
-	var videoCtrl = document.getElementById("imageontainer");
+	var videoCtrl = document.getElementById("imagecontainer");
 	var loop;
 	var board = new Array();
 	var boardids = new Array();

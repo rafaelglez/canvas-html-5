@@ -1,20 +1,8 @@
 body{
 font-family:Verdana;
 font-size:12px;
-}
-input[type=range] {
-    -webkit-appearance: none;
-    background-color: silver;
-    width: 200px;
-    height:20px;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-     -webkit-appearance: none;
-    background-color: #666;
-    opacity: 0.5;
-    width: 10px;
-    height: 26px;
+color:#fff;
+background-color:black;
 }
 
 #canvas {
@@ -28,4 +16,19 @@ width:200px;
 position: absolute; 
 top: 50px; 
 left: 750px;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    background-color: silver;
+    width: 231px;
+    height:20px;
+}
+
+input[type="range"]:-webkit-slider-thumb {
+     -webkit-appearance: none;
+    background-color: #ccc;
+    opacity: 0.5;
+    width: 231px;
+    height: 10px;
 }
