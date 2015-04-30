@@ -13,12 +13,12 @@ function eventWindowLoaded() {
 		alert("no video support");
 	return;
 	}
-	videoElement.addEventListener("canplaythrough",videoLoaded,false);
+	videoElement.addEventListener("canplay",videoLoaded,false);
 	videoElement.setAttribute("src", "http://quiet.pcriot.com/video/bailar" + "." + videoType);
 	videoElement.setAttribute("width", 640);
 	videoElement.setAttribute("height", 360);
 	
-		Debugger.log(videoElement.buffered);
+		//Debugger.log(videoElement.buffered);
 	
 }
 
@@ -32,12 +32,14 @@ function isFirefox(){
 
 function supportedVideoFormat(video){
 	var returnExtension = "";
-	if(isFirefox() && (video.canPlayType("video/ogg") =="probably" || video.canPlayType("video/ogg") == "maybe")) {
+	//if(isFirefox() && (video.canPlayType("video/ogg") =="probably" || video.canPlayType("video/ogg") == "maybe")) {
+	if(video.canPlayType("video/ogg") =="probably" || video.canPlayType("video/ogg") == "maybe") {
 		returnExtension = "ogv";
+	}
+	 else if(video.canPlayType("video/mp4") == "probably" || video.canPlayType("video/mp4") == "maybe") {
+		returnExtension = "mp4";
 	} else if (video.canPlayType("video/webm") == "probably" || video.canPlayType("video/webm") == "maybe") {
 		returnExtension = "webm";
-	} else if(video.canPlayType("video/mp4") == "probably" || video.canPlayType("video/mp4") == "maybe") {
-		returnExtension = "mp4";
 	}
 	return returnExtension;
 }
@@ -89,7 +91,7 @@ function canvasApp(){
 	//Initialize Board
 	function init(){
 		complete = false;
-		 Debugger.log("Dura "+videoElement.duration);
+		 //Debugger.log("Dura "+videoElement.duration);
 		// Debugger.log(" Fin "+videoElement.buffered.end(0));
 		// Debugger.log(" Inicio "+videoElement.buffered.start(0));
 		board = new Array();
@@ -171,7 +173,7 @@ function canvasApp(){
 	}
 	
 	function update(){
-	//Debugger.log("complete: "+complete);
+	Debugger.log("complete: "+complete);
 		if (complete == false){
 		var count = 0;
 		for (var c = 0; c < cols; c++) {
@@ -347,13 +349,13 @@ function eventMouseUp(event) {
 		canvas.removeEventListener("mouseup",eventMouseUp, false);
 		document.removeEventListener("keydown",keyDownListener,false);
 		videoElement.removeEventListener("ended",videoEnded,false);
-		videoElement.removeEventListener("canplaythrough",videoLoaded,false);
+		videoElement.removeEventListener("canplay",videoLoaded,false);
 		animationFrame.cancel(loop);
 		videoElement.pause();
 		complete = false;
 		var videoType = supportedVideoFormat(videoElement);
 		videoElement.setAttribute("src", "http://quiet.pcriot.com/video/" + videoSel + "." + videoType);
-		videoElement.addEventListener("canplaythrough",init,false);
+		videoElement.addEventListener("canplay",init,false);
 	}
 	
 }
