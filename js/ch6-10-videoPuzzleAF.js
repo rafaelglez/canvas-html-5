@@ -13,13 +13,16 @@ function eventWindowLoaded() {
 		alert("no video support");
 	return;
 	}
-	videoElement.addEventListener("canplay",videoLoaded,false);
+	if(isFirefox()){
+		videoElement.addEventListener("loadeddata",videoLoaded,false);
+		
+	}
+	else {
+		videoElement.addEventListener("canplaythrough",videoLoaded,false);
+	}
 	videoElement.setAttribute("src", "http://quiet.pcriot.com/video/bailar" + "." + videoType);
 	videoElement.setAttribute("width", 640);
 	videoElement.setAttribute("height", 360);
-	
-		//Debugger.log(videoElement.buffered);
-	
 }
 
 function isFirefox(){
@@ -82,6 +85,7 @@ function canvasApp(){
 	var fPosYOffset = (divRows * yPad)/2;
 	var curPosXOffset = 0;
 	var curPosYOffset = 0;
+	var loading = "Cargando video...";
 	
 	init();
 	}
@@ -91,9 +95,6 @@ function canvasApp(){
 	//Initialize Board
 	function init(){
 		complete = false;
-		 //Debugger.log("Dura "+videoElement.duration);
-		// Debugger.log(" Fin "+videoElement.buffered.end(0));
-		// Debugger.log(" Inicio "+videoElement.buffered.start(0));
 		board = new Array();
 		boardids = new Array();
 		completeAr = new Array();
@@ -173,7 +174,6 @@ function canvasApp(){
 	}
 	
 	function update(){
-	Debugger.log("complete: "+complete);
 		if (complete == false){
 		var count = 0;
 		for (var c = 0; c < cols; c++) {
@@ -199,7 +199,6 @@ function canvasApp(){
 		
 		}
 		
-		//Debugger.log("complete reduce "+complete);
 		if (complete == false && !videoElement.paused){
 			videoElement.pause();
 		}
@@ -214,8 +213,6 @@ function canvasApp(){
 			if(curPosYOffset < fPosYOffset){
 				curPosYOffset = curPosYOffset + 0.1;
 			}
-			//Debugger.log("fPosXOffset "+fPosXOffset);
-			//Debugger.log("curPosXOffset "+curPosXOffset);
 				for (var c = 0; c < cols; c++) {
 					for (var r = 0; r < rows; r++) {
 						var tempPiece = board[c][r];
@@ -234,7 +231,12 @@ function canvasApp(){
 		context.fillStyle = '#303030';
 		context.fillRect(0, 0, canvas.width, canvas.height);
 		//Box
-		context.strokeStyle = '#FFFFFF';
+		if(complete){
+			context.strokeStyle = '#C4F7FC';
+		}
+		else{
+			context.strokeStyle = '#FFFFFF';
+		}
 		context.strokeRect(startXOffset/2, startXOffset/2, canvas.width-startXOffset, canvas.height-startYOffset);
 		
 		for (var c = 0; c < cols; c++){
@@ -242,7 +244,7 @@ function canvasApp(){
 				var tempPiece = board[c][r];
 				context.drawImage(videoElement, tempPiece.imageX, tempPiece.imageY, partWidth, partHeight, tempPiece.placeX, tempPiece.placeY, partWidth, partHeight);
 				if (tempPiece.selected) {
-					context.strokeStyle = '#FFFF00';
+					context.strokeStyle = "#C4F7FC";
 					context.strokeRect(tempPiece.placeX, tempPiece.placeY, partWidth, partHeight);
 				}
 			}
@@ -316,7 +318,6 @@ function eventMouseUp(event) {
 
 	function keyDownListener(e){
 		var key = e.keyCode;
-		//Debugger.log(e.keyCode);
 		if (key == 83){
 		animationFrame.cancel(loop);
 		videoElement.pause();
@@ -344,18 +345,27 @@ function eventMouseUp(event) {
 		var target;
 		preventDefault(e);
         target = getTarget(e);
-		Debugger.log(target.alt);
 		videoSel = target.alt;
 		canvas.removeEventListener("mouseup",eventMouseUp, false);
 		document.removeEventListener("keydown",keyDownListener,false);
 		videoElement.removeEventListener("ended",videoEnded,false);
-		videoElement.removeEventListener("canplay",videoLoaded,false);
-		animationFrame.cancel(loop);
+		if(isFirefox()){
+			videoElement.removeEventListener("loadeddata",videoLoaded,false);
+		}
+		else {
+			videoElement.removeEventListener("canplaythrough",videoLoaded,false);
+		}		animationFrame.cancel(loop);
 		videoElement.pause();
 		complete = false;
 		var videoType = supportedVideoFormat(videoElement);
 		videoElement.setAttribute("src", "http://quiet.pcriot.com/video/" + videoSel + "." + videoType);
-		videoElement.addEventListener("canplay",init,false);
+		
+		if(isFirefox()){
+			videoElement.addEventListener("loadeddata",init,false);
+		}
+		else {
+			videoElement.addEventListener("canplaythrough",init,false);
+		}
 	}
 	
 }
