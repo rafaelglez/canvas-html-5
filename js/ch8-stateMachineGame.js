@@ -6,50 +6,91 @@ function canvasSupport () {
 
 function canvasApp(){
 
-	var canvas = document.getElementById("canvas");
-	var FRAME_RATE = 30;
-	var intervalTime = 1000/FRAME_RATE;
-	var loop;
-	var shipState = 0; //canvasApp level variables //0 = static, 1 = thrust
-	var rotation = 0; //rotation angle in degrees
-	var x = 50;
-	var y = 50;
-	var width = 20;
-	var height = 20;
-	var offsetX = width / 2;
-	var offsetY = height / 2;
-	var alpha = 1;
-	var facingX = 0;
-	var facingY = 0;
-	var movingX = 0;
-	var movingY = 0;
-	var rotationalVelocity = 5; //how many degrees to turn the ship
-	var thrustAcceleration = .03;
-	var keyPressList = [];
-	var currentVelocity = 0;
-	var maxVelocity = 2;
-	
-	// Add event listener to keyword
-	document.addEventListener("keydown",keyListener,false);
-	document.addEventListener("keyup",keyListener,false);
-
 	if (!canvas || !canvas.getContext){
 		return;
 	}
 	var context = canvas.getContext("2d");
 	if (!context) {
-	return;
+		return;
 	}
+
+	//application states
+	@const GAME_STATE_TITLE = 0;
+	@const GAME_STATE_NEW_GAME = 1;
+	@const GAME_STATE_NEW_LEVEL = 2;
+	@const GAME_STATE_PLAYER_START = 3;
+	@const GAME_STATE_PLAY_LEVEL = 4;
+	@const GAME_STATE_PLAYER_DIE = 5;
+	@const GAME_STATE_GAME_OVER = 6;
+	var currentGameState = 0;
+	var currentGameStateFunction = null;
+	var loop;
+	
+	// Add event listener to keyword
+	document.addEventListener("keydown",keyListener,false);
+	document.addEventListener("keyup",keyListener,false);
+	
+	//** application start
+	switchGameState(GAME_STATE_TITLE);
+
+	//* application loop
+	FRAME_RATE = 40;
+	var intervalTime = 1000/FRAME_RATE;
+	var frameRateCounter = new FrameRateCounter();
 	
 	gameLoop();
+
+	function switchGameState(newState) {
+		currentGameState = newState;
+		switch (currentGameState){
+		case GAME_STATE_TITLE:
+			currentGameStateFunction = gameStateTitle;
+		break;
+		case GAME_STATE_PLAY_LEVEL:
+			currentGameStateFunctionappStatePlayeLevel;
+		break;
+		case GAME_STATE_GAME_OVER:
+			currentGameStateFunction = gameStateGameOver;
+		break;
+		}
+	}
+
+	function gameStateTitle() {
+		//Debugger.log("appStateTitle");
+		// draw background and text
+		context.fillStyle = '#000000';
+		context.fillRect(0, 0, 200, 200);
+		context.fillStyle = '#ffffff';
+		context.font = '20px sans-serif';
+		context.textBaseline = 'top';
+		context.fillText ("Title Screen", 50, 90);
+	}
+
+	function gameStatePlayLevel() {
+		Debugger.log("appStateGamePlay");
+	}
+
+	function gameStateGameOver() {
+		Debugger.log("appStateGameOver");
+	}
+
+	function runGame(){
+		currentGameStateFunction();
+	}
+
 	
 	function gameLoop() {
+		runGame();
 		loop = window.setTimeout(gameLoop, intervalTime);
-		drawScreen();
 	}
 	
-	function drawScreen() {
+	function gameStatePlayLevel() {
+		checkKeys();
+		update();
+		render();
+	}
 	
+	function checkKeys() {
 		// up arrow
 		if (keyPressList[38]==true){
 		//thrust
@@ -62,7 +103,7 @@ function canvasApp(){
 			if (currentVelocity < maxVelocity) {
 				movingX = movingX+thrustAcceleration*facingX;
 				movingY = movingY+thrustAcceleration*facingY;
-				}		
+			}		
 		}
 		
 		//left arrow
@@ -81,43 +122,32 @@ function canvasApp(){
 			movingX = 0;
 			movingY = 0;
 		} 
+	}
 		
+	function update() {
 		x = x+movingX;
-		y = y+movingY;	
-		
-		// draw background and text
-		context.globalAlpha = 1;
-		context.fillStyle = '#000000';	
+		y = y+movingY;
+		frameRateCounter.countFrames();
+	}
+	
+	function render(){
+		//draw background and text
+		context.fillStyle = '#000000';
 		context.fillRect(0, 0, 200, 200);
 		context.fillStyle = '#ffffff';
 		context.font = '20px sans-serif';
 		context.textBaseline = 'top';
-		context.fillText ("Player Ship - rotate", 0, 180);
+		context.fillText ("render/update", 0, 180);
 		//transformation
 		var angleInRadians = rotation * Math.PI / 180;
 		context.globalAlpha = alpha;
 		context.save(); //save current state in stack
 		context.setTransform(1,0,0,1,0,0); // reset to identity
 		
-		
 		//translate the canvas origin to the center of the player
 		//context.translate(x,y);
 		context.translate(x+offsetX,y+offsetY);
 		context.rotate(angleInRadians);
-		
-		//drawShip
-		/* context.strokeStyle = '#ffffff';
-		context.beginPath();
-		context.moveTo(10,0);
-		context.lineTo(19,19);
-		context.lineTo(10,9);
-		context.moveTo(9,9);
-		context.lineTo(0,19);
-		context.lineTo(9,0); 
-		*/
-		
-		//using the width and height to calculate
-
 		context.strokeStyle = '#ffffff';
 		context.beginPath();
 
@@ -130,32 +160,18 @@ function canvasApp(){
 		context.moveTo(11-offsetX,9-offsetY);
 		context.lineTo(0-offsetX,-offsetY);
 		
-/* 		
-		context.moveTo(10-offsetX,0-offsetY);
-		context.lineTo(19-offsetX,19-offsetY);
-		context.lineTo(10-offsetX,9-offsetY);
-		context.moveTo(9-offsetX,9-offsetY);
-		context.lineTo(0-offsetX,19-offsetY);
-		context.lineTo(9-offsetX,0-offsetY);
- */		
-		
-		//draw thrust
-		/* context.moveTo(8,13);
-		context.lineTo(11,13);
-		context.moveTo(9,14);
-		context.lineTo(9,18);
-		context.moveTo(10,14);
-		context.lineT	o(10,18); */
-		
 		context.stroke();
 		context.closePath();
 		
 		//restore context
-		context.restore(); //pop old state on to screen
-		//add rotation until ship reaches 360 degrees
+		context.restore();
+	
+	}
+	
+	
+	function initShip(){
+		//add rotation until ship reaches 360 degrees & change alpha
 		//Debugger.log("r = "+ rotation +" alpha "+alpha);
-		
-		function initShip(){
 		if(rotation < 360){
 			alpha = 0;
 			rotation += 3;
@@ -166,16 +182,13 @@ function canvasApp(){
 				alpha = 1;
 			}
 		}
-		}
-		
-		
 	}	
 	
 	//Event handlers
 	function keyListener(e){
 		var key = e.keyCode;
 		
-		//Debugger.log(key);
+		Debugger.log(key);
 		if(e.type == "keydown"){
 			if (key == 37 || key == 38 || key == 39){
 				keyPressList[key] = true;
@@ -193,10 +206,34 @@ function canvasApp(){
 			}
 		}
 		
-		
 		if (key == 83){
 		clearInterval(loop);
 		}
 		//Debugger.log(keyPressList);
-	}	
+	}
+
+
+	//*** FrameRateCounter object prototype
+	function FrameRateCounter() {
+		this.lastFrameCount = 0;
+		var dateTemp = new Date();
+		this.frameLast = dateTemp.getTime();
+		delete dateTemp;
+		this.frameCtr = 0;
+	}
+
+	FrameRateCounter.prototype.countFrames=function() {
+		var dateTemp = new Date();
+		this.frameCtr++;
+		if (dateTemp.getTime() >=this.frameLast+1000) {
+		Debugger.log("frame event");
+		this.lastFrameCount = this.frameCtr;
+		this.frameLast = dateTemp.getTime();
+		this.frameCtr = 0;
+		}
+		delete dateTemp;
+	}
+
+
+	
 }

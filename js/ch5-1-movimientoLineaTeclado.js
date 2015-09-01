@@ -24,6 +24,7 @@ function canvasApp(){
 	var dx = dxCtrl.value;
 	var dy = dyCtrl.value;
 	var loop;
+	var maxVelocity = 2;
 	
 	document.addEventListener("keydown",keyDownListener,false);
 
