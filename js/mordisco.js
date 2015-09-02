@@ -14,65 +14,56 @@ function mordiscoApp(){
 	}
 	var canvas = document.getElementById("canvas");
 	var context = canvas.getContext("2d");
-	var speed = 3;
+	var speed = 5;
+	var maxSpeed = 50;
 	var dx = 0;
 	var dy = 0;
 	var loop;
 	var sqrWidth = 15;
 	var sqrHeight = 15;
-	var maxVelocity = 5;
 	var sqrWidthOffset = sqrWidth/2
 	var sqrHeightOffset = sqrHeight/2
 	var y = (canvas.height/2) - sqrWidthOffset;
 	var x = (canvas.width/2) - sqrHeightOffset;
-	var xPrev = null;
-	var yPrev = null;
-	var maxVelocity = 5;
+	var xPrev = 0;
+	var yPrev = 0;
 	var sqrArray = [];
 	var number = 1;
 	var changeNumber = true;
 	var numberFactor = 1;
 	var numberPosition = {};
-	var lastNumber = 1;
 	var sqrArrayLen = 0;
 	const MIN_LENGTH = 2;
 	
 	function init(){
 		
 	}
-	
-	
+		
 	document.addEventListener("keydown",keyDownListener,false);
 
 	function drawScreen() {
 		context.fillStyle = '#00f';
 		context.fillRect(0, 0, canvas.width, canvas.height);
 		
-		//modificamos el valor de x y y de acuerdo a lo solicitado por el usuario
+		//change x and y values according user input
 		xPrev = x;
 		yPrev = y;
 		x = x + (speed * dx);
 		y = y + (speed * dy); 
-		
-		if (changeNumber){
-			alert(changeNumber);
-		}
 		
 		if(changeNumber){
 			numberPosition = getNumberPosition();
 			changeNumber = false;
 		}
 		
-
+		drawNumber(number,numberPosition);		
 		
-		
-		// dibujamos un rectagulo en el centro de la pantalla
+		// dibujamos el cuadrado inicial en el centro de la pantalla
 		context.fillStyle = "#FF0";
 		context.beginPath();
 		
-		
 		if(x != xPrev || y != yPrev){
-			sqrArray.push([x,y,sqrWidth,sqrHeight]);
+			sqrArray.push([x,y]);
 		}
 		else{
 			context.rect(x,y,sqrWidth,sqrHeight);
@@ -83,23 +74,32 @@ function mordiscoApp(){
 			sqrArray = sqrArray.slice(sqrArray.length - (numberFactor + 1), sqrArray.length);
 		}
 		
-		Debugger.log("array len"+sqrArray.length);
-		Debugger.log("numberFactor "+numberFactor);
-		Debugger.log("number "+number);
 		
-		
-		for(var i = 0, len = sqrArray.length; i < len; i++){
-			context.rect(sqrArray[i][0],sqrArray[i][1],sqrArray[i][2],sqrArray[i][3]);
+		sqrArrayLen = sqrArray.length;
+		for(var i = 0; i < sqrArrayLen; i++){
+			context.rect(sqrArray[i][0],sqrArray[i][1],sqrWidth,sqrHeight);
 		}
 
 		context.closePath();
 		context.fill();
-		context.rect(numberPosition.x,numberPosition.y,numberPosition.sqrWidth,sqrHeight);
-		context.font="15px Arial bolder";
-		context.textAlign="center";
-		context.fillText(number,numberPosition.x,numberPosition.y);
 		
-
+		if(sqrArray.length){
+			var xn = parseInt(numberPosition.x);
+			var yn = parseInt(numberPosition.y);
+			//A mordisco has occurred 
+			var mordisco = collision(x,y,x + sqrWidth,y + sqrHeight, xn , yn, (xn + sqrWidth), (yn + sqrHeight));
+			if(mordisco){
+				changeNumber = true;
+				number++;
+				numberFactor = 60 * number;
+				if(number > 9){
+					numberFactor = 1;	
+					number = 1;
+					speed = speed + 2;
+				}				
+			}
+		}
+		
 		
 		//identificamos centro del canvas
 		// context.moveTo(0,canvas.height/2);
@@ -121,11 +121,11 @@ function mordiscoApp(){
 	//Event handler
 	function keyDownListener(e){
 		var key = e.keyCode;
-		Debugger.log(e.keyCode);
-		if (key == 187){
-			number++;
-			numberFactor = 20 * number;
-		}
+		//Debugger.log(e.keyCode);
+		// if (key == 187){
+			// number++;
+			// numberFactor = 20 * number;
+		// }
 		// stop
 		if (key == 83){
 			dy = 0;
@@ -165,15 +165,12 @@ function mordiscoApp(){
 			tempY = Math.floor(Math.random()*(canvas.height - sqrHeight));
 			//check if there is a collision
 			for(var i = 0, len = sqrArray.length; i < len; i++){
-				collisionDetected = collision(tempX,tempY, tempX+srqWidth, tempY+sqrHeight,sqrArray[i][0], sqrArray[i][1], sqrArray[i][0] + sqrArray[i][2], sqrArray[i][1] + sqrArray[i][3]);			
+				collisionDetected = collision(tempX,tempY, tempX+sqrWidth, tempY+sqrHeight,sqrArray[i][0], sqrArray[i][1], sqrArray[i][0] + sqrWidth, sqrArray[i][1] + sqrHeight);			
 				if(collisionDetected){
-					Debugger.log("Colisión : "+collisionDetected);
 					break;
 				}
 			}
 			positionOK = !collisionDetected;
-			Debugger.log("collisionDetected : "+ collisionDetected);
-			Debugger.log("positionOK : "+ positionOK);
 		}
 		return {x:tempX,y:tempY};
 		
@@ -181,16 +178,16 @@ function mordiscoApp(){
 	}
 	
 	function drawNumber(number,position){
-		context.strokeStyle="red";
-		//context.rect(position.x,position.y,position.x+sqrWidth,position.y+sqrHeight);
-		context.font="15px bold";
+		context.strokeStyle=getColor();
+		context.strokeRect(numberPosition.x,numberPosition.y,sqrWidth,sqrHeight);
+		context.font="20px Verdana bolder";
 		context.textAlign="center";
-		context.fillText(number,position.x,position.y);
-		context.stroke();
+		context.fillStyle = "#FF0";
+		context.fillText(number,numberPosition.x + sqrWidthOffset,numberPosition.y+sqrHeight);
 	}
 	
 	//Detect collisions
-	function collition(x11,y11,x12,y12,x21,y21,x22,y22){
+	function collision(x11,y11,x12,y12,x21,y21,x22,y22){
 		var collision = false;
 		
 		   xOverlap = Math.max(0, Math.min(x12,x22) - Math.max(x11,x21))
