@@ -14,7 +14,7 @@ function mordiscoApp(){
 	}
 	var canvas = document.getElementById("canvas");
 	var context = canvas.getContext("2d");
-	var speed = 5;
+	var speed = 3;
 	var maxSpeed = 50;
 	var dx = 0;
 	var dy = 0;
@@ -33,13 +33,23 @@ function mordiscoApp(){
 	var numberFactor = 1;
 	var numberPosition = {};
 	var sqrArrayLen = 0;
-	const MIN_LENGTH = 2;
+	var MIN_LENGTH = 2;
+	var FRAME_RATE = 60;
+	var rev = false;
+	var color = "#ff0";
+	
+	document.addEventListener("keydown",keyDownListener,false);
+	loop = setInterval(drawScreen,1000 / FRAME_RATE);
+	
+	// function gameLoop() {
+		// drawScreen();
+	// }
 	
 	function init(){
 		
 	}
 		
-	document.addEventListener("keydown",keyDownListener,false);
+	
 
 	function drawScreen() {
 		context.fillStyle = '#00f';
@@ -59,7 +69,7 @@ function mordiscoApp(){
 		drawNumber(number,numberPosition);		
 		
 		// dibujamos el cuadrado inicial en el centro de la pantalla
-		context.fillStyle = "#FF0";
+		context.fillStyle = color;
 		context.beginPath();
 		
 		if(x != xPrev || y != yPrev){
@@ -70,7 +80,7 @@ function mordiscoApp(){
 		}
 		
 		sqrArrayLen = sqrArray.length;
-		if (sqrArrayLen > MIN_LENGTH){
+		if (sqrArrayLen > MIN_LENGTH && (dx || dy	)){
 			sqrArray = sqrArray.slice(sqrArray.length - (numberFactor + 1), sqrArray.length);
 		}
 		
@@ -93,12 +103,36 @@ function mordiscoApp(){
 				number++;
 				numberFactor = 60 * number;
 				if(number > 9){
-					numberFactor = 1;	
+					numbserFactor = 1;	
 					number = 1;
 					speed = speed + 2;
 				}				
 			}
 		}
+		
+		if(wallCollision(x,y)){
+			console.log("wall collision");
+			dx = dy = 0;
+			sqrArrayLen = sqrArray.length
+			sqrArray = sqrArray.slice(0,sqrArray.length-1)
+			if(rev == false){
+				sqrArray.reverse();
+				rev = true;
+			}	
+			color = "#f00";
+		}
+		
+		
+		// if(selfCollision(x,y,sqrArray)){
+			// console.log("self collision");
+			// dx = dy = 0;
+			// sqrArrayLen = sqrArray.length
+			// sqrArray = sqrArray.slice(0,sqrArray.length-1)
+			// sqrArray.reverse();
+			// rev = true;
+			// color = "#f00";
+		// }
+		
 		
 		
 		//identificamos centro del canvas
@@ -110,13 +144,7 @@ function mordiscoApp(){
 		
 	}
 		
-	function gameLoop() {
-		drawScreen();
-	}
 	
-	gameLoop();
-
-	loop = setInterval(gameLoop,50);
 
 	//Event handler
 	function keyDownListener(e){
@@ -186,16 +214,36 @@ function mordiscoApp(){
 		context.fillText(number,numberPosition.x + sqrWidthOffset,numberPosition.y+sqrHeight);
 	}
 	
+	//Detect collision with walls
+	function wallCollision(x,y){
+		if(x > canvas.width - sqrWidth || x < 0 || y > canvas.height - sqrHeight || y < 0){
+			return true
+		}
+	}
+	
+	
+	//Detect self collision
+	function selfCollision(x,y,arr){
+		var res = false;
+		for(var i = 0, len = arr.length; i < len; i++){
+			res = collision(x,y,x + sqrWidth,y + sqrHeight, arr[i][0], arr[i][1], arr[i][0] + sqrWidth, arr[i][1] + sqrHeight)
+			if(res){
+				break;
+			}
+		}
+		return res;
+	}
+	
 	//Detect collisions
 	function collision(x11,y11,x12,y12,x21,y21,x22,y22){
-		var collision = false;
+		var res = false;
 		
 		   xOverlap = Math.max(0, Math.min(x12,x22) - Math.max(x11,x21))
            yOverlap = Math.max(0, Math.min(y12,y22) - Math.max(y11,y21));
 			if ( xOverlap * yOverlap ){
-				collision = true;
+				res = true;
 			}
-		return collision;
+		return res;
 	}
 	
 	// Returns a random number between min (inclusive) and max (exclusive)
