@@ -38,6 +38,7 @@ function mordiscoApp(){
 	var rev = false;
 	var color = "#ff0";
 	var collided = false;
+	var score = 0;
 	
 	init();
 	
@@ -53,6 +54,7 @@ function mordiscoApp(){
 		speed = 1;
 		numberFactor = 10 * number;
 		collided = false;
+		
 		
 		//identificamos centro del canvas
 		// context.moveTo(0,canvas.height/2);
@@ -81,6 +83,8 @@ function mordiscoApp(){
 		
 		//draws number
 		drawNumber(number,numberPosition);
+		//draws score
+		drawScore();
 	}
 	
 	function update(){
@@ -116,9 +120,11 @@ function mordiscoApp(){
 			if(mordisco){
 				changeNumber = true;
 				number++;
+				score = score + 10;
 				numberFactor = 10 * number;
 				if(number > 9){
-					numberFactor = 1;	
+					numberFactor = 1;
+					score = score + 100;	
 					number = 1;
 					speed++;
 				}	
@@ -212,11 +218,23 @@ function mordiscoApp(){
 	function drawNumber(number,position){
 		context.strokeStyle=getColor();
 		context.strokeRect(numberPosition.x,numberPosition.y,sqrWidth,sqrHeight);
-		context.font="20px Verdana bolder";
+		context.font="15px Verdana bolder";
 		context.textAlign="center";
+		context.textBaseline="top";		
 		context.fillStyle = "#FF0";
-		context.fillText(number,numberPosition.x + sqrWidthOffset,numberPosition.y+sqrHeight);
+		//context.fillText(number,numberPosition.x + sqrWidthOffset,numberPosition.y+sqrHeight);
+		context.fillText(number,numberPosition.x + sqrWidthOffset,numberPosition.y);
 	}
+	
+	function drawScore(){
+		context.strokeStyle="#f0f";
+		context.font="25px arcade";
+		context.textBaseline="top"; 
+		context.textAlign="start";
+		context.fillStyle = "#FF0";
+		context.fillText("SCORE "+score,10,10);
+	}
+	
 	
 	//Detect collision with walls
 	function wallCollision(x,y){
